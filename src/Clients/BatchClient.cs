@@ -1,18 +1,16 @@
+using System;
+using System.Net.Http;
+using System.Net.Http.Formatting;
+using System.Threading.Tasks;
 using BatchClient;
 using BatchSpeechToTextDemo.Models;
 using Microsoft.Extensions.Options;
+using Newtonsoft.Json;
+using Polly;
+using Polly.Retry;
 
 namespace BatchSpeechToTextDemo
 {
-    using System;
-    using System.Net;
-    using System.Net.Http;
-    using System.Net.Http.Formatting;
-    using System.Threading.Tasks;
-    using Newtonsoft.Json;
-    using Polly;
-    using Polly.Retry;
-    
     public class BatchClient
     {
         private const string SpeechToTextBasePath = "speechtotext/v3.0/";

@@ -67,12 +67,14 @@ namespace BatchSpeechToTextDemo.Services
             // if the transcription was successful, check the results
             if (transcription.Status == "Succeeded")
             {
-                var paginatedfiles = await _client.GetTranscriptionFilesAsync(transcription.Links.Files).ConfigureAwait(false);
+                var paginatedFiles = await _client.GetTranscriptionFilesAsync(transcription.Links.Files).ConfigureAwait(false);
 
-                var resultFile = paginatedfiles.Values.FirstOrDefault(f => f.Kind == ArtifactKind.Transcription);
+                var resultFile = paginatedFiles.Values.FirstOrDefault(f => f.Kind == ArtifactKind.Transcription);
                 var result = await _client.GetTranscriptionResultAsync(new Uri(resultFile.Links.ContentUrl)).ConfigureAwait(false);
                 Console.WriteLine("Transcription succeeded. Results: ");
-                Console.WriteLine(JsonConvert.SerializeObject(result, SpeechJsonContractResolver.WriterSettings));
+                Console.WriteLine($"==== File: {result.Source}. Combined recognized phrases:");
+                Console.WriteLine(JsonConvert.SerializeObject(result.CombinedRecognizedPhrases, SpeechJsonContractResolver.WriterSettings));
+                //Console.WriteLine(JsonConvert.SerializeObject(result, SpeechJsonContractResolver.WriterSettings));
             }
             else
             {
@@ -135,6 +137,7 @@ namespace BatchSpeechToTextDemo.Services
 
                 // </transcriptionstatus>
                 // check again after 1 minute
+                Console.WriteLine("Waiting 1 minute for Transcription results...");
                 await Task.Delay(TimeSpan.FromMinutes(1)).ConfigureAwait(false);
             }
         }

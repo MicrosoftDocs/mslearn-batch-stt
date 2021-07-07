@@ -1,10 +1,10 @@
+using System.Collections.Generic;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
+using Newtonsoft.Json.Serialization;
+
 namespace BatchSpeechToTextDemo
 {
-    using System.Collections.Generic;
-    using Newtonsoft.Json;
-    using Newtonsoft.Json.Converters;
-    using Newtonsoft.Json.Serialization;
-
     public class SpeechJsonContractResolver : CamelCasePropertyNamesContractResolver
     {
         public SpeechJsonContractResolver()

@@ -1,13 +1,12 @@
+using System;
+using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
+using System.Runtime.Serialization;
 using Newtonsoft.Json;
 
 namespace BatchSpeechToTextDemo.Models
 {
-    using System;
-    using System.Net;
-    using System.Runtime.Serialization;
-
     [Serializable]
     public sealed class FailedHttpClientRequestException : Exception
     {
