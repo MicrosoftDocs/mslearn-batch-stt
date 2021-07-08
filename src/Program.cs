@@ -25,7 +25,7 @@ namespace BatchSpeechToTextDemo
             
             var service = provider.GetRequiredService<SpeechService>();
             await service.TranscribeAsync();
-
+            
             Console.WriteLine("Finished processing batch transcription.");
             Console.WriteLine("Press any key...");
             Console.ReadKey();
