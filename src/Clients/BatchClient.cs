@@ -85,7 +85,7 @@ namespace BatchSpeechToTextDemo
             {
                 throw new ArgumentNullException(nameof(transcription));
             }
-
+            
             var path = $"{SpeechToTextBasePath}transcriptions/";
 
             return this.PostAsJsonAsync<Transcription, Transcription>(path, transcription);
@@ -110,10 +110,10 @@ namespace BatchSpeechToTextDemo
             this._client.DefaultRequestHeaders.Add("Ocp-Apim-Subscription-Key", key);
         }
 
-        private async Task<TResponse> PostAsJsonAsync<TPayload, TResponse>(string path, TPayload payload)
+        private async Task<TResponse> PostAsJsonAsync<TPayload, TResponse>(string path, TPayload payload, string customModel = null)
         {
-            string json = JsonConvert.SerializeObject(payload, SpeechJsonContractResolver.WriterSettings);
-            StringContent content = new StringContent(json);
+            var json = JsonConvert.SerializeObject(payload, SpeechJsonContractResolver.WriterSettings);
+            var content = new StringContent(json);
             content.Headers.ContentType = JsonMediaTypeFormatter.DefaultMediaType;
 
             var response = await TransientFailureRetryingPolicy

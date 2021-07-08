@@ -8,6 +8,8 @@ namespace BatchSpeechToTextDemo.Models
 
         public string ApiKey { get; set; }
 
-        public string AudioBlobContainer { get; set; }
+        public Uri AudioBlobContainer { get; set; }
+
+        public Uri CustomModel { get; set; }
     }
 }
