@@ -69,12 +69,15 @@ namespace BatchSpeechToTextDemo.Services
             {
                 var paginatedFiles = await _client.GetTranscriptionFilesAsync(transcription.Links.Files).ConfigureAwait(false);
 
-                var resultFile = paginatedFiles.Values.FirstOrDefault(f => f.Kind == ArtifactKind.Transcription);
-                var result = await _client.GetTranscriptionResultAsync(new Uri(resultFile.Links.ContentUrl)).ConfigureAwait(false);
-                Console.WriteLine("Transcription succeeded. Results: ");
-                Console.WriteLine($"==== File: {result.Source}. Combined recognized phrases:");
-                Console.WriteLine(JsonConvert.SerializeObject(result.CombinedRecognizedPhrases, SpeechJsonContractResolver.WriterSettings));
-                //Console.WriteLine(JsonConvert.SerializeObject(result, SpeechJsonContractResolver.WriterSettings));
+                var results = paginatedFiles.Values.Where(f => f.Kind == ArtifactKind.Transcription).ToList();
+                Console.WriteLine($"Transcription succeeded. { results.Count() } Results: ");
+                foreach (var resultFile in results)
+                {
+                    var result = await _client.GetTranscriptionResultAsync(new Uri(resultFile.Links.ContentUrl)).ConfigureAwait(false);
+                    
+                    Console.WriteLine($"==== File: {result.Source}. Combined recognized phrases:");
+                    Console.WriteLine(JsonConvert.SerializeObject(result.CombinedRecognizedPhrases, SpeechJsonContractResolver.WriterSettings));
+                }
             }
             else
             {
