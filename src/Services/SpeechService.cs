@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.InteropServices.ComTypes;
 using System.Threading.Tasks;
 using BatchClient;
 using BatchSpeechToTextDemo.Models;
@@ -17,15 +18,16 @@ namespace BatchSpeechToTextDemo.Services
         
         private readonly ILogger<SpeechService> _logger;
         private readonly BatchClient _client;
-        private readonly Uri _audioBlobContainer;
+
+        private readonly SpeechServiceOptions _options;
         
         public SpeechService(ILogger<SpeechService> logger, BatchClient batchClient, IOptions<SpeechServiceOptions> options)
         {
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
             _client = batchClient ?? throw new ArgumentNullException(nameof(batchClient));
             
-            var containerUrl = options.Value?.AudioBlobContainer ?? throw new ArgumentNullException("AudioBlobContainer");
-            _audioBlobContainer = new Uri(containerUrl);
+            if (options.Value?.AudioBlobContainer == null) throw new ArgumentNullException("AudioBlobContainer");
+            _options = options.Value;
         }
         
         public async Task TranscribeAsync()
@@ -43,18 +45,26 @@ namespace BatchSpeechToTextDemo.Services
 
         private async Task<Transcription> CreateTranscription()
         {
-            // <transcriptiondefinition>
+            // Transcription Definition
             var newTranscription = new Transcription
             {
                 DisplayName = DisplayName, 
                 Locale = Locale, 
-                ContentContainerUrl = _audioBlobContainer,
+                ContentContainerUrl = _options.AudioBlobContainer,
                 Properties = new TranscriptionProperties
                 {
                     IsWordLevelTimestampsEnabled = true,
                     TimeToLive = TimeSpan.FromDays(1)
                 }
             };
+
+            if (_options.CustomModel != null)
+            {
+                newTranscription.Model = new EntityReference
+                {
+                    Self = _options.CustomModel
+                };
+            }
 
             newTranscription = await _client.CreateTranscriptionAsync(newTranscription).ConfigureAwait(false);
             Console.WriteLine($"Created transcription {newTranscription.Self}");
@@ -137,8 +147,7 @@ namespace BatchSpeechToTextDemo.Services
                     Console.WriteLine(
                         $"Transcriptions status: {completed} completed, {running} running, {notStarted} not started yet");
                 } while (paginatedTranscriptions.NextLink != null);
-
-                // </transcriptionstatus>
+                
                 // check again after 1 minute
                 Console.WriteLine("Waiting 1 minute for Transcription results...");
                 await Task.Delay(TimeSpan.FromMinutes(1)).ConfigureAwait(false);
